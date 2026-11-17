@@ -1,0 +1,51 @@
+### Variáveis
+@base = http://localhost:8080
+
+### Catálogo (público)
+GET {{base}}/api/catalogo/categorias
+
+### Cadastro de cidadão (público) — CPF precisa ter dígitos verificadores válidos
+POST {{base}}/api/usuarios
+Content-Type: application/json
+
+{"nome":"Maria Souza","email":"maria@exemplo.com","cpf":"52998224725","endereco":"Rua das Acácias, 45","senha":"minhaSenha123"}
+
+### Login (público) — guarda o token para as próximas requisições
+# @name login
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{"login":"52998224725","senha":"minhaSenha123"}
+
+###
+@token = {{login.response.body.token}}
+
+### Dados do cidadão logado
+GET {{base}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### Registrar reclamação (o cidadão vem do token; categoriaId deve existir no catálogo)
+POST {{base}}/api/reclamacoes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"categoriaId":1,"descricao":"Buraco próximo à esquina.","endereco":"Rua das Acácias, 45"}
+
+### Meus protocolos (recomendado)
+GET {{base}}/api/protocolos/meus
+Authorization: Bearer {{token}}
+
+### Meus protocolos (compatível com o contrato original — só aceita o próprio id)
+GET {{base}}/api/protocolos/usuario/1
+Authorization: Bearer {{token}}
+
+### Consultar protocolo pelo ID
+GET {{base}}/api/protocolos/1
+Authorization: Bearer {{token}}
+
+### Consultar protocolo pelo código público
+GET {{base}}/api/protocolos/codigo/PC-20261115-A1B2C3D4
+Authorization: Bearer {{token}}
+
+### Sem token → 401
+GET {{base}}/api/protocolos/meus
